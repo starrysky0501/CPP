@@ -1,9 +1,9 @@
 namespace LY
 {
 	template<class T>
-	struct __list_node     //±íÊ¾Ò»¸ö½áµãµÄÀà£¬½«½Úµã½øĞĞ·â×°
+	struct __list_node     //è¡¨ç¤ºä¸€ä¸ªç»“ç‚¹çš„ç±»ï¼Œå°†èŠ‚ç‚¹è¿›è¡Œå°è£…
 	{
-		__list_node<T>* _next;  //Ô´´úÂëÖĞµÄnextÓÃÁËvoid*,·ºĞÍ
+		__list_node<T>* _next;  //æºä»£ç ä¸­çš„nextç”¨äº†void*,æ³›å‹
 		__list_node<T>* _prev;
 		T _data;
 
@@ -15,38 +15,61 @@ namespace LY
 	};
 
 
-	template<class T, class Ref, class Ptr >
-	struct __list_iterator     //µü´úÆ÷Ö±½ÓÓÃnode*²»ĞĞ£¬·â×°³ÉÀà£¬»áÓÃµ½ÔËËã·ûÖØÔØ¡£
+	template<class T, class Ref, class Ptr >     //ä»£ç å¤ç”¨æ€§
+	struct __list_iterator     //è¿­ä»£å™¨ç›´æ¥ç”¨node*ä¸è¡Œï¼Œå°è£…æˆç±»ï¼Œä¼šç”¨åˆ°è¿ç®—ç¬¦é‡è½½ã€‚
 	{
 		typedef __list_node<T> node;
 		typedef __list_iterator<T, Ref, Ptr> Self;
-		node* _node;         //½ÚµãµÄÖ¸Õë
+		node* _node;         //èŠ‚ç‚¹çš„æŒ‡é’ˆ
 
 		__list_iterator(node *node)
 			:_node(node)
 		{}
 
-		Ref operator*()         //½«ÀàÄ£°åÉèÖÃ³ÉÈı¸ö²ÎÊı£¬ÆäÖĞµÚ¶ş¸ö¾ÍÊÇÎªÁË¿ØÖÆËüµÄ·µ»ØÖµ
+		Ref operator*()        //å°†ç±»æ¨¡æ¿è®¾ç½®æˆä¸‰ä¸ªå‚æ•°ï¼Œå…¶ä¸­ç¬¬äºŒä¸ªå°±æ˜¯ä¸ºäº†æ§åˆ¶å®ƒçš„è¿”å›å€¼
 		{
-			return _node->_data;
+			return _node->_data;   //ä¾›å†…ç½®ç±»å‹ä½¿ç”¨
 		}
 
-		Self& operator++()    //Ç°ÖÃ++   ½«__list_iteratorÖØ¶¨ÒåÎªSelf£¬·ñÔòÓÃ__list_iterator<T>»á±¨´í£¬²ÎÊıÌ«ÉÙ¡£
+		Ptr operator->()       //ç”±äºæˆ‘æ˜¯ç”¨Dateç±»è°ƒç”¨ï¼Œæ‰€ä»¥è¿™é‡Œçš„è¿”å›å€¼å¯ä»¥ç†è§£ä¸ºDate*
+		{
+			return &_node->_data;  //ä¾›è‡ªå®šä¹‰ç±»å‹ä½¿ç”¨
+		}
+
+		Self& operator++()    //å‰ç½®++   å°†__list_iteratoré‡å®šä¹‰ä¸ºSelfï¼Œå¦åˆ™ç”¨__list_iterator<T>ä¼šæŠ¥é”™ï¼Œå‚æ•°å¤ªå°‘ã€‚
 		{
 			_node = _node->_next;
 			return *this;
 		}
 
-		Self operator++(int)  //ºóÖÃ++
+		Self operator++(int)  //åç½®++
 		{
 			__list_node<T> tmp(*this);
 			_node = _node->_next;
 			return tmp;
 		}
 
-		bool operator!=(const Self& it)
+		Self& operator--()   
+		{
+			_node = _node->_prev;
+			return *this;
+		}
+
+		Self operator--(int)  
+		{
+			__list_node<T> tmp(*this);
+			_node = _node->_prev;
+			return tmp;
+		}
+
+		bool operator!=(const Self& it)  //ç”¨èŠ‚ç‚¹çš„æŒ‡é’ˆæ¯”è¾ƒ
 		{
 			return _node != it._node;
+		}
+
+		bool operator==(const Self& it)
+		{
+			return _node == it._node;
 		}
 	};
 
@@ -54,11 +77,11 @@ namespace LY
 	template<class T>
 	class list
 	{
-		typedef __list_node<T> node;   //½«½ÚµãÖØÃüÃû
+		typedef __list_node<T> node;   //å°†èŠ‚ç‚¹é‡å‘½å
 
 	public:
 		typedef __list_iterator<T,T&,T*> iterator;
-		typedef __list_iterator<T,const T&,const T*> const_iterator;  //Á½¸öÀàĞÍµÄµü´úÆ÷¸´ÓÃÍ¬Ò»¸östruct __list_iteratorÀàÄ£°å
+		typedef __list_iterator<T,const T&,const T*> const_iterator;  //ä¸¤ä¸ªç±»å‹çš„è¿­ä»£å™¨å¤ç”¨åŒä¸€ä¸ªstruct __list_iteratorç±»æ¨¡æ¿
 
 		iterator begin()  
 		{
@@ -79,36 +102,79 @@ namespace LY
 			return const_iterator(_head);
 		}
 
-		list()                         //³õÊ¼»¯Í·½Úµã£¬´øÍ·Ë«ÏòÑ­»·
+		list()                         //åˆå§‹åŒ–å¤´èŠ‚ç‚¹ï¼Œå¸¦å¤´åŒå‘å¾ªç¯
 		{
 			_head = new node(T());
 			_head->_next = _head;
 			_head->_prev = _head;
 		}
 
-		void push_back(const T& x)       //ÕâÀï²»ÓÃ·ÖÀàÌÖÂÛÊÇ·ñ´øÍ·½Úµã
+		void push_back(const T& x)       //è¿™é‡Œä¸ç”¨åˆ†ç±»è®¨è®ºæ˜¯å¦å¸¦å¤´èŠ‚ç‚¹
 		{
-			node *newnode = new node(x);  //´´½¨Ò»¸ö½áµã,µ÷ÓÃ¹¹Ôìº¯Êı³õÊ¼»¯
-			node *tail = _head->_prev;   //tail---newnode---head
+			//node *newnode = new node(x);  //åˆ›å»ºä¸€ä¸ªç»“ç‚¹,è°ƒç”¨æ„é€ å‡½æ•°åˆå§‹åŒ–
+			//node *tail = _head->_prev;   //tail---newnode---head
 
-			tail->_next = newnode;
-			newnode->_prev = tail;
-			newnode->_next = _head;
-			_head->_prev = newnode;
+			//tail->_next = newnode;
+			//newnode->_prev = tail;
+			//newnode->_next = _head;
+			//_head->_prev = newnode;
+
+			insert(end(), x);
+		}
+
+		void push_front(const T& x)
+		{
+			insert(begin(), x);
+		}
+
+		void pop_back()
+		{
+			erase(--end());
+		}
+
+		void pop_front()
+		{
+			erase(begin());
+		}
+
+		void insert(iterator pos, const T& x)  //åœ¨posä½ç½®å‰æ’å…¥è¯¥xå€¼
+		{
+			node* cur = pos._node;
+			node* prev = cur->_prev;
+			node* newnode = new node(x);
+
+			prev->_next = newnode;     //prev newnode cur
+			newnode->_prev = prev;
+			newnode->_next = cur;
+			cur->_prev = newnode;
+		}
+
+		void erase(iterator pos)   //è¿­ä»£å™¨poså¤±æ•ˆï¼Œè¢«delete
+		{
+			node* cur = pos._node;
+			assert(cur != _head);
+
+			node* prev = cur->_prev;
+			node* next = cur->_next;
+
+			prev->_next = next;
+			next->_prev = prev;
+
+			delete cur;
 		}
 
 	private:
-		node* _head;  //Ö¸ÏòÍ·½áµãµÄµÄÖ¸Õë
+		node* _head;  //æŒ‡å‘å¤´ç»“ç‚¹çš„çš„æŒ‡é’ˆ
 	};
 
 
-	void print_list(const list<int>& l)   //ÓÉÓÚÊÇconst¶ÔÏó£¬Ôò±ØĞëµ÷ÓÃconstº¯Êı, ËùÒÔÓ¦¸øbeginºÍendºóÃæ¼Óconst
+	void print_list(const list<int>& l)   //ç”±äºæ˜¯constå¯¹è±¡ï¼Œåˆ™å¿…é¡»è°ƒç”¨constå‡½æ•°, æ‰€ä»¥åº”ç»™beginå’Œendåé¢åŠ const
 	{
-		list<int>::const_iterator it = l.begin();
+		list<int>::const_iterator it = l.begin();        //åªèƒ½è¯»ä¸èƒ½ä¿®æ”¹
 		while (it != l.end())
 		{
 			std::cout << *it << " ";
-			++it;                        //ÎªÊ²Ã´²»¿ÉÒÔÓÃºóÖÃ++
+			++it;                        //ä¸ºä»€ä¹ˆä¸å¯ä»¥ç”¨åç½®++
 		}
 		std::cout << std::endl;
 	}
@@ -120,15 +186,40 @@ namespace LY
 		h.push_back(2);
 		h.push_back(3);
 		h.push_back(4);
-		print_list(h);
+		print_list(h);                    
+
 		list<int>::iterator it = h.begin();
-		while (it != h.end())
+		while (it != h.end())                 //å¯è¯»å¯ä¿®æ”¹
 		{
 			*it *= 2;
-			++it;                          //ÎªÊ²Ã´²»¿ÉÒÔÓÃºóÖÃ++
+			++it;                          //ä¸ºä»€ä¹ˆä¸å¯ä»¥ç”¨åç½®++
 		}
 		print_list(h);
 	}
 	
+
+	struct Date
+	{
+		int _year = 1900;
+		int _month = 1;
+		int _day = 1;
+	};
+	
+	void Test_list2()
+	{
+		list<Date> l;
+		l.push_back(Date());
+		l.push_back(Date());
+		auto it = l.begin();
+		while (it != l.end())
+		{
+			//it->_yearå¯ä»¥ç†è§£ä¸ºï¼šit.operator->()_year,ä½†å…¶å®æ˜¯it->->_year;ä½†ä¸ºäº†å¯è¯»æ€§ï¼Œç¼–è¯‘å™¨åšäº†ç‰¹æ®Šå¤„ç†ï¼Œçœæ‰äº†ä¸€ä¸ªç®­å¤´ç¬¦å·
+			std::cout <<it->_year<<"-"<<it->_month<<"-"<<it->_day<< std::endl;
+			++it;
+		}
+
+	}
 }
+
+
 
